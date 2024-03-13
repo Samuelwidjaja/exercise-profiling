@@ -7,9 +7,7 @@ import com.advpro.profiling.tutorial.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author muhammad.khadafi
@@ -24,18 +22,23 @@ public class StudentService {
     private StudentCourseRepository studentCourseRepository;
 
     public List<StudentCourse> getAllStudentsWithCourses() {
+        List<StudentCourse> studentCourses = studentCourseRepository.findAll();
+
+        Map<Long, Student> student_id = new HashMap<>();
         List<Student> students = studentRepository.findAll();
-        List<StudentCourse> studentCourses = new ArrayList<>();
         for (Student student : students) {
-            List<StudentCourse> studentCoursesByStudent = studentCourseRepository.findByStudentId(student.getId());
-            for (StudentCourse studentCourseByStudent : studentCoursesByStudent) {
-                StudentCourse studentCourse = new StudentCourse();
-                studentCourse.setStudent(student);
-                studentCourse.setCourse(studentCourseByStudent.getCourse());
-                studentCourses.add(studentCourse);
-            }
+            student_id.put(student.getId(), student);
         }
-        return studentCourses;
+
+        List<StudentCourse> result = new ArrayList<>();
+        for (StudentCourse studentCourse : studentCourses) {
+            Student student = student_id.get(studentCourse.getStudent().getId());
+            StudentCourse newStudentCourse = new StudentCourse();
+            newStudentCourse.setStudent(student);
+            newStudentCourse.setCourse(studentCourse.getCourse());
+            result.add(newStudentCourse);
+        }
+        return result;
     }
 
     public Optional<Student> findStudentWithHighestGpa() {
@@ -60,4 +63,3 @@ public class StudentService {
         return result.substring(0, result.length() - 2);
     }
 }
-
