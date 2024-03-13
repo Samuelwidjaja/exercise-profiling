@@ -56,10 +56,15 @@ public class StudentService {
 
     public String joinStudentNames() {
         List<Student> students = studentRepository.findAll();
-        String result = "";
+        StringBuilder result_Builder = new StringBuilder();
+
         for (Student student : students) {
-            result += student.getName() + ", ";
+            result_Builder.append(student.getName()).append(", ");
         }
-        return result.substring(0, result.length() - 2);
+
+        if (!result_Builder.isEmpty()) {
+            result_Builder.delete(result_Builder.length() - 2, result_Builder.length());
+        }
+        return result_Builder.toString();
     }
 }
